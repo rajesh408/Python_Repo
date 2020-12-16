@@ -1,0 +1,68 @@
+from tkinter import *
+from tkinter.ttk import *
+import MySQLdb
+
+class LoginScreen:
+    def validateUser(self):
+        self.usrnm = self.username.get()
+        self.usrpwd= self.password.get()
+        #establishing database connection
+        dbcon = MySQLdb.connect('localhost','root','root','python_db')
+
+        #cursor object creation
+        cursorobj = dbcon.cursor()
+
+        #executing SQL Queries using execute().....
+        cursorobj.execute("select password from userdet where name=%s",(self.usrnm,))
+
+        #fetching a single row using fetchone().....
+        data = cursorobj.fetchone()
+
+        if self.usrpwd==data[0]:
+            MainScreen(mainwindow)
+            self.win.withdraw()
+
+        #closing the connection
+        dbcon.close()
+        
+    def __init__(self,win):
+        self.win=win
+        self.win.title("Login Screen")
+        self.win.geometry('400x200+400+300')
+        lbl=Label(mainwindow,text="This is Login window")
+        lbl.pack(side=TOP,pady=10)
+
+        self.lblusr=Label(mainwindow,text="Username")
+        self.lblusr.pack(side=TOP,pady=12)
+        
+        self.username = Entry(win)
+        self.username.place(x=260,y=55)
+        
+        lblpwd=Label(mainwindow,text="Password")
+        lblpwd.pack(side=TOP,pady=12)
+
+        
+        self.password = Entry(win)
+        self.password.place(x=260,y=85)
+        
+        btn=Button(mainwindow,text='submit',command=self.validateUser)
+        btn.pack(pady=10)
+        #btn.bind("<Button>",lambda e:MainScreen(mainwindow))
+        
+        
+class MainScreen(Toplevel):
+    def __init__(self,mainwindow=None):
+        super().__init__(mainwindow)
+        self.title("Main Window/Screen")
+        self.geometry('600x600')
+        self.configure(bg='blue')
+        lbl2=Label(self,text='This is Main window')
+        lbl2.pack()
+        
+if __name__ == '__main__':    
+    mainwindow = Tk()
+    LoginScreen(mainwindow)
+    #mainwindow.geometry("200x200")
+
+    
+    mainloop()
